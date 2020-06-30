@@ -1,11 +1,11 @@
 class Player {
     private var name: String
-    private(set) var nickname: String
+    var nickname: Character
     var pods: Int
     
     init(name: String) {
         self.name = name
-        self.nickname = name
+        self.nickname = Array(name) [0]
         self.pods = 9
     }
 }
