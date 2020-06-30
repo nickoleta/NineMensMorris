@@ -15,11 +15,12 @@ class Playground {
         printBoard()
         
         // Each player has 9 moves
-        var initialMoves = 18 // TODO: make global constant
+        var initialMoves = 9 // TODO: make global constant
         while initialMoves > 0 {
             move(true, firstPlayer, secondPlayer);
             move(true, secondPlayer, firstPlayer);
             initialMoves = initialMoves - 1
+            print("Init moves: ", initialMoves)
         }
         
         while true { // TODO: condition is to have at least 3 pods
@@ -40,13 +41,13 @@ class Playground {
             return
         }
         
-        makeMove(isInitialMove, coordinates, firstPlayer, secondPlayer)
+        makeMove(isInitialMove, coordinates, fdebug", irstPlayer, secondPlayer)
         
     }
     
     func makeMove(_ isInitialMove: Bool, _ coordinates: [Character], _ firstPlayer: Player, _ secondPlayer: Player) -> Void {
         // TODO: converting X and Y twice (here and in isLegalMove)
-        if(isLegalMove(coordinates)) {
+        if(!isLegalMove(coordinates)) {
             print("Invalid move")
             move(isInitialMove, firstPlayer, secondPlayer)
             return;
@@ -118,19 +119,19 @@ class Playground {
     func getX(_ xCoordinate: Character) -> Int {
         switch xCoordinate {
         case "A":
-            return 1
+            return 0
         case "B":
-            return 2
+            return 1
         case "C":
-            return 2;
+            return 2
         case "D":
-            return 3;
+            return 3
         case "E":
-            return 4;
+            return 4
         case "F":
-            return 5;
+            return 5
         case "G":
-            return 6;
+            return 6
         default:
             return 0 // TODO: fix default case
         }
@@ -154,6 +155,7 @@ class Playground {
     }
     
     func checkAllPossibilitiesForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
+        print("debug here")
         var hasThreePodsHorizontally = false
         var hasThreePodsVertically = false
         
@@ -177,10 +179,13 @@ class Playground {
             hasThreePodsVertically = checkVertically(yCoordinate, possibilities, playerNickname)
         }
         
+        print("debug", hasThreePodsHorizontally)
+        print("debug", hasThreePodsVertically)
         return hasThreePodsHorizontally || hasThreePodsVertically
     }
 
     func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
+        print("Possibilities: ", possibilities)
         for possibility in possibilities {
             if(game.board[possibility][yCoordinate] != playerNickname) {
                 return false
@@ -237,6 +242,8 @@ class Playground {
             }
             print()
         }
+        
+        print()
     }
     
     func removePod(_ firstPlayerNickname: Character, _ secondPlayer: Player) -> Void {
