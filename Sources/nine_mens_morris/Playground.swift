@@ -9,6 +9,8 @@ class Playground {
         self.game = Game()
     }
     
+    // TODO: You cannot take a pod that is part of a 3-ka
+    
     func startGame() -> Void {
         print("Nine men's morris")
         
@@ -41,13 +43,13 @@ class Playground {
             return
         }
         
-        makeMove(isInitialMove, coordinates, fdebug", irstPlayer, secondPlayer)
+        makeMove(isInitialMove, coordinates, firstPlayer, secondPlayer)
         
     }
     
     func makeMove(_ isInitialMove: Bool, _ coordinates: [Character], _ firstPlayer: Player, _ secondPlayer: Player) -> Void {
         // TODO: converting X and Y twice (here and in isLegalMove)
-        if(!isLegalMove(coordinates)) {
+        if(!isLegalMove(coordinates, secondPlayer)) {
             print("Invalid move")
             move(isInitialMove, firstPlayer, secondPlayer)
             return;
@@ -75,6 +77,7 @@ class Playground {
         
         if hasThreePods(xCoordinate, yCoordinate, firstPlayerNickname) {
             removePod(firstPlayerNickname, secondPlayer)
+            printBoard()
         }
     }
     
@@ -98,7 +101,7 @@ class Playground {
     }
 
     
-    func isLegalMove(_ coordinates: [Character]) -> Bool {
+    func isLegalMove(_ coordinates: [Character],_ enemy: Player) -> Bool {
         let xCoordinate = getX(coordinates[0])
         let yCoordinate = Int(String(coordinates[1]))! - 1
         
@@ -110,7 +113,7 @@ class Playground {
         
         // verify that the chosen position is legal
         let value = game.board[xCoordinate][yCoordinate]
-        if value == "X" || value == "|" || value == "-" { // TODO: constants
+        if value == "X" || value == "|" || value == "-" || value == enemy.nickname { // TODO: constants
             return false
         }
         return true
@@ -155,7 +158,6 @@ class Playground {
     }
     
     func checkAllPossibilitiesForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
-        print("debug here")
         var hasThreePodsHorizontally = false
         var hasThreePodsVertically = false
         
@@ -175,17 +177,14 @@ class Playground {
             } else {
                 hasThreePodsVertically = checkVertically(yCoordinate, [4, 5, 6], playerNickname)
             }
-            let possibilities = getPossibilities(yCoordinate)
-            hasThreePodsVertically = checkVertically(yCoordinate, possibilities, playerNickname)
+            let possibilities = getPossibilities(xCoordinate)
+            hasThreePodsHorizontally = checkHorizontally(xCoordinate, possibilities, playerNickname)
         }
         
-        print("debug", hasThreePodsHorizontally)
-        print("debug", hasThreePodsVertically)
         return hasThreePodsHorizontally || hasThreePodsVertically
     }
 
     func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
-        print("Possibilities: ", possibilities)
         for possibility in possibilities {
             if(game.board[possibility][yCoordinate] != playerNickname) {
                 return false
@@ -254,7 +253,7 @@ class Playground {
         let xCoordinate = getX(coordinates[0])
         let yCoordinate = Int(String(coordinates[1]))! - 1
 
-        if !isLegalMove(coordinates) || game.board[xCoordinate][yCoordinate] != secondPlayer.nickname {
+        if !isLegalMove(coordinates, secondPlayer) || game.board[xCoordinate][yCoordinate] != secondPlayer.nickname {
             print("Invalid move")
             removePod(firstPlayerNickname, secondPlayer) // TODO: use while loop instead of calling the same function
             return
@@ -262,7 +261,7 @@ class Playground {
         
         game.board[xCoordinate][yCoordinate] = "o" // TODO: constant
         
-        if hasEnoughPods(secondPlayer) {
+        if !hasEnoughPods(secondPlayer) {
             endGame(firstPlayerNickname)
             return
         }
