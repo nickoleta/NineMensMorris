@@ -1,6 +1,9 @@
 class Playground {
+    
     let INITIAL_MOVES_COUNT = 9
     let FREE_POSITION : Character = "o"
+    
+    let GAME_NAME = "Nine men's morris"
     let INVALID_MOVE_MSG = "Invalid move!"
     
     private(set) var firstPlayer: Player
@@ -14,7 +17,7 @@ class Playground {
     }
     
     func startGame() -> Void {
-        print("Nine men's morris")
+        print(GAME_NAME)
         
         printBoard()
         
@@ -29,12 +32,12 @@ class Playground {
         
         repeat {
             move(false, firstPlayer, secondPlayer)
-            if !hasEnoughPods(secondPlayer) {
+            if !hasEnoughPawns(secondPlayer) {
                 endGame()
                 return
             }
             move(false, secondPlayer, firstPlayer)
-        } while hasEnoughPods(firstPlayer)
+        } while hasEnoughPawns(firstPlayer)
         
         endGame()
     }
@@ -81,14 +84,13 @@ class Playground {
         game.board[xCoordinate][yCoordinate] = firstPlayerNickname
         printBoard()
         
-        if hasThreePods(xCoordinate, yCoordinate, firstPlayerNickname) {
-            removePod(player, enemy, isInitialMove)
+        if hasThreePawns(xCoordinate, yCoordinate, firstPlayerNickname) {
+            removePawn(player, enemy, isInitialMove)
             printBoard()
         }
     }
     
     func isValidInput(_ coordinates: [Character], _ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Bool {
-        // TODO: validate coordinates.count - here or in moveValidation() method
         let xCoordinate = getX(coordinates[0])
         let yCoordinateStr = coordinates[1]
         if yCoordinateStr <= "0" || yCoordinateStr > "9" {
@@ -115,6 +117,16 @@ class Playground {
     }
     
     func isValidMove(_ coordinates: [Character], _ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Bool {
+        if isInitialMove && coordinates.count != 2 {
+            print(INVALID_MOVE_MSG)
+            return false
+        }
+        
+        if !isInitialMove && coordinates.count != 4 {
+            print(INVALID_MOVE_MSG)
+            return false
+        }
+        
         let oldXCoordinate = getX(coordinates[0])
         let oldYCoordinate = Int(String(coordinates[1]))! - 1
         
@@ -153,7 +165,6 @@ class Playground {
     
     func areTwoPositionsNextToEachOther(_ staticCoordinate: Int, _ oldCoordinate: Int, _ newCoordinate: Int) -> Bool {
         let maxDistance = getPossitionsDistnace(staticCoordinate)
-        print("Max distance is ", maxDistance)
         if oldCoordinate - newCoordinate != maxDistance && newCoordinate - oldCoordinate != maxDistance {
             print(INVALID_MOVE_MSG)
             return false
@@ -182,7 +193,7 @@ class Playground {
         }
     }
     
-    func hasThreePods(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
+    func hasThreePawns(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
         // middle rows are handled differently
         if xCoordinate == 3 || yCoordinate == 3 {
             return checkAllPossibilities(xCoordinate, yCoordinate, [], playerNickname, true)
@@ -200,30 +211,30 @@ class Playground {
     }
     
     func checkAllPossibilitiesForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
-        var hasThreePodsHorizontally = false
-        var hasThreePodsVertically = false
+        var hasThreePawnsHorizontally = false
+        var hasThreePawnsVertically = false
         
         if xCoordinate == 3 {
             if yCoordinate < 3 {
-                hasThreePodsHorizontally = checkHorizontally(xCoordinate, [0,1,2], playerNickname)
+                hasThreePawnsHorizontally = checkHorizontally(xCoordinate, [0,1,2], playerNickname)
             } else {
-                hasThreePodsHorizontally = checkHorizontally(xCoordinate, [4, 5, 6], playerNickname)
+                hasThreePawnsHorizontally = checkHorizontally(xCoordinate, [4, 5, 6], playerNickname)
             }
             let possibilities = getPossibilities(yCoordinate)
-            hasThreePodsVertically = checkVertically(yCoordinate, possibilities, playerNickname)
+            hasThreePawnsVertically = checkVertically(yCoordinate, possibilities, playerNickname)
         }
         
         if yCoordinate == 3 {
             if xCoordinate < 3 {
-                hasThreePodsVertically = checkVertically(yCoordinate, [0,1,2], playerNickname)
+                hasThreePawnsVertically = checkVertically(yCoordinate, [0,1,2], playerNickname)
             } else {
-                hasThreePodsVertically = checkVertically(yCoordinate, [4, 5, 6], playerNickname)
+                hasThreePawnsVertically = checkVertically(yCoordinate, [4, 5, 6], playerNickname)
             }
             let possibilities = getPossibilities(xCoordinate)
-            hasThreePodsHorizontally = checkHorizontally(xCoordinate, possibilities, playerNickname)
+            hasThreePawnsHorizontally = checkHorizontally(xCoordinate, possibilities, playerNickname)
         }
         
-        return hasThreePodsHorizontally || hasThreePodsVertically
+        return hasThreePawnsHorizontally || hasThreePawnsVertically
     }
 
     func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
@@ -298,40 +309,40 @@ class Playground {
         print()
     }
     
-    func removePod(_ player: Player, _ enemy: Player, _ isInitialMove: Bool) -> Void {
+    func removePawn(_ player: Player, _ enemy: Player, _ isInitialMove: Bool) -> Void {
         var coordinates: [Character]
         var xCoordinate: Int
         var yCoordinate: Int
         repeat {
-            print("Please, choose a pod to be removed")
+            print("Please, choose a pawn to be removed")
             let input = readLine()
             coordinates = Array(input!)
 
             xCoordinate = getX(coordinates[0])
             yCoordinate = Int(String(coordinates[1]))! - 1
-        } while !isValidInput(coordinates, isInitialMove, player, enemy) || game.board[xCoordinate][yCoordinate] != enemy.nickname || !canPodBeRemoved(xCoordinate, yCoordinate, enemy)
+        } while !isValidInput(coordinates, isInitialMove, player, enemy) || game.board[xCoordinate][yCoordinate] != enemy.nickname || !canPawnBeRemoved(xCoordinate, yCoordinate, enemy)
 
         game.board[xCoordinate][yCoordinate] = FREE_POSITION
         
-        if !hasEnoughPods(enemy) {
+        if !hasEnoughPawns(enemy) {
             endGame()
             return
         }
 
-        enemy.pods = enemy.pods - 1
+        enemy.pawns = enemy.pawns - 1
         printBoard()
     }
     
-    func canPodBeRemoved(_ xCoordinate: Int, _ yCoordinate : Int, _ player: Player) -> Bool {
-        return !hasThreePods(xCoordinate, yCoordinate, player.nickname)
+    func canPawnBeRemoved(_ xCoordinate: Int, _ yCoordinate : Int, _ player: Player) -> Bool {
+        return !hasThreePawns(xCoordinate, yCoordinate, player.nickname)
     }
     
-    func hasEnoughPods(_ player: Player) -> Bool {
-        return player.pods > 2
+    func hasEnoughPawns(_ player: Player) -> Bool {
+        return player.pawns > 2
     }
     
     func endGame() -> Void {
-        let winner = firstPlayer.pods > 3 ? firstPlayer.nickname : secondPlayer.nickname
+        let winner = firstPlayer.pawns > 3 ? firstPlayer.nickname : secondPlayer.nickname
         print("Game over")
         print(winner, " won!")
     }
