@@ -16,7 +16,7 @@ class Playground {
         self.game = Game()
     }
     
-    func startGame() -> Void {
+    public func startGame() {
         print(GAME_NAME)
         
         printBoard()
@@ -27,7 +27,7 @@ class Playground {
             move(true, firstPlayer, secondPlayer)
             move(true, secondPlayer, firstPlayer)
             initialMoves = initialMoves - 1
-            print("Initial moves: ", initialMoves)
+            print("Initial moves: \(initialMoves)")
         }
         
         repeat {
@@ -42,18 +42,23 @@ class Playground {
         endGame()
     }
     
-    func move(_ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Void {
+    public func endGame() {
+        let winner = firstPlayer.pawns > 3 ? firstPlayer.nickname : secondPlayer.nickname
+        print("Game over! \(winner) won!")
+    }
+    
+    private func move(_ isInitialMove: Bool, _ player: Player, _ enemy: Player) {
         var coordinates: [Character]
         if isInitialMove {
             repeat {
-                print("Player ", player.nickname)
+                print("Player \(player.nickname)")
                 
                 let input = readLine()
                 coordinates = Array(input!)
             } while !isValidInput(coordinates, isInitialMove, player, enemy)
         } else {
             repeat {
-                print("Player ", player.nickname)
+                print("Player \(player.nickname)")
                 
                 let input = readLine()
                 coordinates = Array(input!)
@@ -63,7 +68,7 @@ class Playground {
         makeMove(isInitialMove, coordinates, player, enemy)
     }
     
-    func makeMove(_ isInitialMove: Bool, _ coordinates: [Character], _ player: Player, _ enemy: Player) -> Void {
+    private func makeMove(_ isInitialMove: Bool, _ coordinates: [Character], _ player: Player, _ enemy: Player) {
         let xCoordinate: Int
         let yCoordinate: Int
         
@@ -90,7 +95,7 @@ class Playground {
         }
     }
     
-    func isValidInput(_ coordinates: [Character], _ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Bool {
+    private func isValidInput(_ coordinates: [Character], _ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Bool {
         let xCoordinate = getX(coordinates[0])
         let yCoordinateStr = coordinates[1]
         if yCoordinateStr <= "0" || yCoordinateStr > "9" {
@@ -116,7 +121,7 @@ class Playground {
         return true
     }
     
-    func isValidMove(_ coordinates: [Character], _ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Bool {
+    private func isValidMove(_ coordinates: [Character], _ isInitialMove: Bool, _ player: Player, _ enemy: Player) -> Bool {
         if isInitialMove && coordinates.count != 2 {
             print(INVALID_MOVE_MSG)
             return false
@@ -163,7 +168,7 @@ class Playground {
         }
     }
     
-    func areTwoPositionsNextToEachOther(_ staticCoordinate: Int, _ oldCoordinate: Int, _ newCoordinate: Int) -> Bool {
+    private func areTwoPositionsNextToEachOther(_ staticCoordinate: Int, _ oldCoordinate: Int, _ newCoordinate: Int) -> Bool {
         let maxDistance = getPossitionsDistnace(staticCoordinate)
         if oldCoordinate - newCoordinate != maxDistance && newCoordinate - oldCoordinate != maxDistance {
             print(INVALID_MOVE_MSG)
@@ -172,7 +177,7 @@ class Playground {
         return true
     }
 
-    func getX(_ xCoordinate: Character) -> Int {
+    private func getX(_ xCoordinate: Character) -> Int {
         switch xCoordinate {
         case "A":
             return 0
@@ -193,7 +198,7 @@ class Playground {
         }
     }
     
-    func hasThreePawns(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
+    private func hasThreePawns(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
         // middle rows are handled differently
         if xCoordinate == 3 || yCoordinate == 3 {
             return checkAllPossibilities(xCoordinate, yCoordinate, [], playerNickname, true)
@@ -203,14 +208,14 @@ class Playground {
         return checkAllPossibilities(xCoordinate, yCoordinate, possibilities, playerNickname, false)
     }
     
-    func checkAllPossibilities(_ xCoordinate: Int, _ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character, _ isMiddleRow: Bool) -> Bool {
+    private func checkAllPossibilities(_ xCoordinate: Int, _ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character, _ isMiddleRow: Bool) -> Bool {
         if isMiddleRow {
             return checkAllPossibilitiesForMiddleRow(xCoordinate, yCoordinate, playerNickname)
         }
         return checkHorizontally(xCoordinate, possibilities, playerNickname) || checkVertically(yCoordinate, possibilities, playerNickname)
     }
     
-    func checkAllPossibilitiesForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
+    private func checkAllPossibilitiesForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
         var hasThreePawnsHorizontally = false
         var hasThreePawnsVertically = false
         
@@ -237,7 +242,7 @@ class Playground {
         return hasThreePawnsHorizontally || hasThreePawnsVertically
     }
 
-    func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
+    private func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
         for possibility in possibilities {
             if game.board[possibility][yCoordinate] != playerNickname {
                 return false
@@ -246,7 +251,7 @@ class Playground {
         return true
     }
     
-    func checkHorizontally(_ xCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool {
+    private func checkHorizontally(_ xCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool {
         for possibility in possibilities {
             if game.board[xCoordinate][possibility] != playerNickname {
                 return false
@@ -255,7 +260,7 @@ class Playground {
         return true
     }
     
-    func getPossibilities(_ coordinate: Int) -> [Int] {
+    private func getPossibilities(_ coordinate: Int) -> [Int] {
         switch coordinate {
             case 0, 6:
                 return [0, 3, 6]
@@ -268,7 +273,7 @@ class Playground {
         }
     }
     
-    func getPossitionsDistnace(_ coordinate: Int) -> Int {
+    private func getPossitionsDistnace(_ coordinate: Int) -> Int {
         switch coordinate {
             case 0, 6:
                 return 3
@@ -281,7 +286,7 @@ class Playground {
         }
     }
     
-    func printBoard() -> Void {
+    private func printBoard() {
         print()
         var board = game.board
         
@@ -309,7 +314,7 @@ class Playground {
         print()
     }
     
-    func removePawn(_ player: Player, _ enemy: Player, _ isInitialMove: Bool) -> Void {
+    private func removePawn(_ player: Player, _ enemy: Player, _ isInitialMove: Bool) {
         var coordinates: [Character]
         var xCoordinate: Int
         var yCoordinate: Int
@@ -333,18 +338,12 @@ class Playground {
         printBoard()
     }
     
-    func canPawnBeRemoved(_ xCoordinate: Int, _ yCoordinate : Int, _ player: Player) -> Bool {
+    private func canPawnBeRemoved(_ xCoordinate: Int, _ yCoordinate : Int, _ player: Player) -> Bool {
         return !hasThreePawns(xCoordinate, yCoordinate, player.nickname)
     }
     
-    func hasEnoughPawns(_ player: Player) -> Bool {
+    private func hasEnoughPawns(_ player: Player) -> Bool {
         return player.pawns > 2
-    }
-    
-    func endGame() -> Void {
-        let winner = firstPlayer.pawns > 3 ? firstPlayer.nickname : secondPlayer.nickname
-        print("Game over")
-        print(winner, " won!")
     }
     
 }
