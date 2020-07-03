@@ -1,5 +1,5 @@
 class Playground {
-    let INITIAL_MOVES_COUNT = 9;
+    let INITIAL_MOVES_COUNT = 9
     let FREE_POSITION : Character = "o"
     let INVALID_MOVE_MSG = "Invalid move!"
     
@@ -26,7 +26,7 @@ class Playground {
             move(true, firstPlayer, secondPlayer)
             move(true, secondPlayer, firstPlayer)
             initialMoves = initialMoves - 1
-            print("Init moves: ", initialMoves)
+            print("Initial moves: ", initialMoves)
         }
         
         repeat {
@@ -55,16 +55,16 @@ class Playground {
     
     func makeMove(_ isInitialMove: Bool, _ coordinates: [Character], _ firstPlayer: Player, _ secondPlayer: Player) -> Void {
         // TODO: converting X and Y twice (here and in isLegalMove)
-        if(!isLegalMove(coordinates)) {
+        if !isLegalMove(coordinates) {
             print(INVALID_MOVE_MSG)
             move(isInitialMove, firstPlayer, secondPlayer)
-            return;
+            return
         }
         
         let xCoordinate: Int
         let yCoordinate: Int
         
-        if(isInitialMove) {
+        if isInitialMove {
             xCoordinate = getX(coordinates[0])
             yCoordinate = Int(String(coordinates[1]))! - 1 // starts counting from 0
         }else{
@@ -90,12 +90,14 @@ class Playground {
     func areValidCoordinates(_ coordinates: [Character], _ isInitialMove: Bool) -> Bool {
         if isInitialMove {
             if coordinates.count != 2 {
-                return false;
+                print(INVALID_MOVE_MSG)
+                return false
             }
         }
         else {
             if coordinates.count != 4 {
-                return false;
+                print(INVALID_MOVE_MSG)
+                return false
             }
             
             // TODO: eliminate illegal moves
@@ -103,23 +105,30 @@ class Playground {
         }
         
         // TODO: check if chars are digits between 0 and 6
-        return true;
+        return true
     }
 
     
     func isLegalMove(_ coordinates: [Character]) -> Bool {
         let xCoordinate = getX(coordinates[0])
-        let yCoordinate = Int(String(coordinates[1]))! - 1
+        let yCoordinateStr = coordinates[1]
+        if yCoordinateStr <= "0" || yCoordinateStr > "9" {
+            print(INVALID_MOVE_MSG)
+            return false
+        }
+        let yCoordinate = Int(String(yCoordinateStr))! - 1
         
         // verify boundaries
         let boardSize = game.board.count
         if xCoordinate >= boardSize || xCoordinate < 0 || yCoordinate >= boardSize || yCoordinate < 0 {
+            print(INVALID_MOVE_MSG)
             return false
         }
         
         // verify that the chosen position is legal
         let value = game.board[xCoordinate][yCoordinate]
         if value == "X" || value == "|" || value == "-" {
+            print(INVALID_MOVE_MSG)
             return false
         }
         return true
@@ -142,7 +151,7 @@ class Playground {
         case "G":
             return 6
         default:
-            return 0 // TODO: fix default case
+            return 7
         }
     }
     
@@ -192,7 +201,7 @@ class Playground {
 
     func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
         for possibility in possibilities {
-            if(game.board[possibility][yCoordinate] != playerNickname) {
+            if game.board[possibility][yCoordinate] != playerNickname {
                 return false
             }
         }
@@ -201,7 +210,7 @@ class Playground {
     
     func checkHorizontally(_ xCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool {
         for possibility in possibilities {
-            if(game.board[xCoordinate][possibility] != playerNickname) {
+            if game.board[xCoordinate][possibility] != playerNickname {
                 return false
             }
         }
