@@ -1,6 +1,6 @@
 class Playground {
     
-    let INITIAL_MOVES_COUNT = 9
+    let INITIAL_MOVES_COUNT = 1
     let FREE_POSITION : Character = "o"
     
     let GAME_NAME = "Nine men's morris"
@@ -49,21 +49,14 @@ class Playground {
     
     private func move(_ isInitialMove: Bool, _ player: Player, _ enemy: Player) {
         var coordinates: [Character]
-        if isInitialMove {
-            repeat {
-                print("Player \(player.nickname)")
+        
+        repeat {
+            print("Player \(player.nickname)")
                 
-                let input = readLine()
-                coordinates = Array(input!)
-            } while !isValidInput(coordinates, isInitialMove, player, enemy)
-        } else {
-            repeat {
-                print("Player \(player.nickname)")
-                
-                let input = readLine()
-                coordinates = Array(input!)
-            } while !isValidInput(coordinates, isInitialMove, player, enemy) || !isValidMove(coordinates,isInitialMove, player, enemy)
-        }
+            let input = readLine()
+            coordinates = Array(input!)
+        } while !isValidInput(coordinates, isInitialMove, player, enemy) || !isValidMove(coordinates,isInitialMove, player, enemy)
+        
         
         makeMove(isInitialMove, coordinates, player, enemy)
     }
