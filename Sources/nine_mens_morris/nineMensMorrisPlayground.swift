@@ -1,6 +1,6 @@
-class Playground {
+class NineMensMorrisPlayground : Playable {
     
-    let INITIAL_MOVES_COUNT = 1
+    let INITIAL_MOVES_COUNT = 9
     let FREE_POSITION : Character = "o"
     
     let GAME_NAME = "Nine men's morris"
@@ -8,12 +8,20 @@ class Playground {
     
     private(set) var firstPlayer: Player
     private(set) var secondPlayer: Player
-    private(set) var game: Game
+    var board: [[Character]]
     
     init(firstPlayer: Player, secondPlayer: Player){
         self.firstPlayer = firstPlayer
         self.secondPlayer = secondPlayer
-        self.game = Game()
+        self.board = [
+            ["o", "-", "-", "o", "-", "-", "o"],
+            ["|", "o", "-", "o", "-", "o", "|"],
+            ["|", "|", "o", "o", "o", "|", "|"],
+            ["o", "o", "o", "X", "o", "o", "o"],
+            ["|", "|", "o", "o", "o", "|", "|"],
+            ["|", "o", "-", "o", "-", "o", "|"],
+            ["o", "-", "-", "o", "-", "-", "o"]
+        ]
     }
     
     public func startGame() {
@@ -72,14 +80,14 @@ class Playground {
             let oldXCoordinate = getX(coordinates[0])
             let oldYCoordinate = Int(String(coordinates[1]))! - 1
             
-            game.board[oldXCoordinate][oldYCoordinate] = FREE_POSITION
+            board[oldXCoordinate][oldYCoordinate] = FREE_POSITION
             
             xCoordinate = getX(coordinates[2])
             yCoordinate = Int(String(coordinates[3]))! - 1
         }
         
         let firstPlayerNickname = player.nickname
-        game.board[xCoordinate][yCoordinate] = firstPlayerNickname
+        board[xCoordinate][yCoordinate] = firstPlayerNickname
         printBoard()
         
         if hasThreePawns(xCoordinate, yCoordinate, firstPlayerNickname) {
@@ -98,14 +106,14 @@ class Playground {
         let yCoordinate = Int(String(yCoordinateStr))! - 1
         
         // verify boundaries
-        let boardSize = game.board.count
+        let boardSize = board.count
         if xCoordinate >= boardSize || xCoordinate < 0 || yCoordinate >= boardSize || yCoordinate < 0 {
             print(INVALID_MOVE_MSG)
             return false
         }
         
         // verify that the chosen position is legal
-        let value = game.board[xCoordinate][yCoordinate]
+        let value = board[xCoordinate][yCoordinate]
         if value == "X" || value == "|" || value == "-" {
             print(INVALID_MOVE_MSG)
             return false
@@ -129,15 +137,15 @@ class Playground {
         let oldYCoordinate = Int(String(coordinates[1]))! - 1
         
         if isInitialMove {
-            let value = game.board[oldXCoordinate][oldYCoordinate]
+            let value = board[oldXCoordinate][oldYCoordinate]
             return value != player.nickname && value != enemy.nickname
         }
         
         let newXCoordinate = getX(coordinates[2])
         let newYCoordinate = Int(String(coordinates[3]))! - 1
         
-        let oldPositionValue = game.board[oldXCoordinate][oldYCoordinate]
-        let newPositionValue = game.board[newXCoordinate][newYCoordinate]
+        let oldPositionValue = board[oldXCoordinate][oldYCoordinate]
+        let newPositionValue = board[newXCoordinate][newYCoordinate]
         
         if oldPositionValue != player.nickname {
             print(INVALID_MOVE_MSG)
@@ -197,7 +205,7 @@ class Playground {
             return checkAllPossibilities(xCoordinate, yCoordinate, [], playerNickname, true)
         }
         
-        let possibilities = getPossibilities(xCoordinate) // TODO: should be xcoodrinate/yCoordinate ?
+        let possibilities = getPossibilities(xCoordinate)
         return checkAllPossibilities(xCoordinate, yCoordinate, possibilities, playerNickname, false)
     }
     
@@ -237,7 +245,7 @@ class Playground {
 
     private func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
         for possibility in possibilities {
-            if game.board[possibility][yCoordinate] != playerNickname {
+            if board[possibility][yCoordinate] != playerNickname {
                 return false
             }
         }
@@ -246,7 +254,7 @@ class Playground {
     
     private func checkHorizontally(_ xCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool {
         for possibility in possibilities {
-            if game.board[xCoordinate][possibility] != playerNickname {
+            if board[xCoordinate][possibility] != playerNickname {
                 return false
             }
         }
@@ -281,7 +289,6 @@ class Playground {
     
     private func printBoard() {
         print()
-        var board = game.board
         
         // print x column coordinates
         print("  ", terminator: "")
@@ -318,9 +325,9 @@ class Playground {
 
             xCoordinate = getX(coordinates[0])
             yCoordinate = Int(String(coordinates[1]))! - 1
-        } while !isValidInput(coordinates, isInitialMove, player, enemy) || game.board[xCoordinate][yCoordinate] != enemy.nickname || !canPawnBeRemoved(xCoordinate, yCoordinate, enemy)
+        } while !isValidInput(coordinates, isInitialMove, player, enemy) || board[xCoordinate][yCoordinate] != enemy.nickname || !canPawnBeRemoved(xCoordinate, yCoordinate, enemy)
 
-        game.board[xCoordinate][yCoordinate] = FREE_POSITION
+        board[xCoordinate][yCoordinate] = FREE_POSITION
         
         if !hasEnoughPawns(enemy) {
             endGame()
