@@ -321,6 +321,12 @@ class NineMensMorrisPlayground : Playable {
         var coordinates: [Character]
         var xCoordinate: Int
         var yCoordinate: Int
+        
+        if !isAnyRemovalPossible(enemy) {
+            print("You cannot remove any of the pawns!")
+            return
+        }
+        
         repeat {
             print("Please, choose a pawn to be removed")
             let input = readLine()
@@ -339,6 +345,17 @@ class NineMensMorrisPlayground : Playable {
 
         enemy.pawns = enemy.pawns - 1
         printBoard()
+    }
+    
+    private func isAnyRemovalPossible(_ player: Player) -> Bool {
+        for x in (0..<board.count) {
+            for y in (0..<board[x].count) {
+                if board[x][y] == player.nickname && !hasThreePawns(x, y, player.nickname){
+                    return true
+                }
+            }
+        }
+        return false
     }
     
     private func canPawnBeRemoved(_ xCoordinate: Int, _ yCoordinate : Int, _ player: Player) -> Bool {
