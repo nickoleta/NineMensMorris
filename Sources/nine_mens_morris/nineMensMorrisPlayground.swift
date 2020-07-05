@@ -58,6 +58,10 @@ class NineMensMorrisPlayground : Playable {
         var coordinates: [Character]
         
         repeat {
+            if canFly(player) {
+                print("\(player.nickname), you have only 3 pawns left. You can move them wherever you want")
+            }
+            
             print("Player \(player.nickname)")
                 
             let input = readLine()
@@ -158,6 +162,10 @@ class NineMensMorrisPlayground : Playable {
         if newPositionValue != FREE_POSITION {
             print(INVALID_MOVE_MSG)
             return false
+        }
+        
+        if canFly(player) {
+            return true
         }
         
         if oldXCoordinate != newXCoordinate && oldYCoordinate != newYCoordinate {
@@ -322,7 +330,7 @@ class NineMensMorrisPlayground : Playable {
         var xCoordinate: Int
         var yCoordinate: Int
         
-        if !isAnyRemovalPossible(enemy) {
+        if !isAnyPawnRemovalPossible(enemy) {
             print("You cannot remove any of the pawns!")
             return
         }
@@ -347,7 +355,7 @@ class NineMensMorrisPlayground : Playable {
         printBoard()
     }
     
-    private func isAnyRemovalPossible(_ player: Player) -> Bool {
+    private func isAnyPawnRemovalPossible(_ player: Player) -> Bool {
         for x in (0..<board.count) {
             for y in (0..<board[x].count) {
                 if board[x][y] == player.nickname && !hasThreePawns(x, y, player.nickname){
@@ -364,6 +372,10 @@ class NineMensMorrisPlayground : Playable {
     
     private func hasEnoughPawns(_ player: Player) -> Bool {
         return player.pawns > 2
+    }
+    
+    private func canFly(_ player: Player) -> Bool {
+        return player.pawns == 3
     }
     
 }
