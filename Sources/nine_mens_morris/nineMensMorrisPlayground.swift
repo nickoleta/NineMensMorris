@@ -26,7 +26,6 @@ class NineMensMorrisPlayground : Playable {
     
     public func startGame() {
         print(GAME_NAME)
-        
         printBoard()
         
         // Each player has 9 initial moves
@@ -138,7 +137,11 @@ class NineMensMorrisPlayground : Playable {
         
         if isInitialMove {
             let value = board[oldXCoordinate][oldYCoordinate]
-            return value != player.nickname && value != enemy.nickname
+            if value == player.nickname || value == enemy.nickname {
+                print(INVALID_MOVE_MSG)
+                return false
+            }
+            return true
         }
         
         let newXCoordinate = getX(coordinates[2])
@@ -170,7 +173,7 @@ class NineMensMorrisPlayground : Playable {
     }
     
     private func areTwoPositionsNextToEachOther(_ staticCoordinate: Int, _ oldCoordinate: Int, _ newCoordinate: Int) -> Bool {
-        let maxDistance = getPossitionsDistnace(staticCoordinate)
+        let maxDistance = getRelationsDistnace(staticCoordinate)
         if oldCoordinate - newCoordinate != maxDistance && newCoordinate - oldCoordinate != maxDistance {
             print(INVALID_MOVE_MSG)
             return false
@@ -202,21 +205,21 @@ class NineMensMorrisPlayground : Playable {
     private func hasThreePawns(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
         // middle rows are handled differently
         if xCoordinate == 3 || yCoordinate == 3 {
-            return checkAllPossibilities(xCoordinate, yCoordinate, [], playerNickname, true)
+            return checkAllRelations(xCoordinate, yCoordinate, [], playerNickname, true)
         }
         
-        let possibilities = getPossibilities(xCoordinate)
-        return checkAllPossibilities(xCoordinate, yCoordinate, possibilities, playerNickname, false)
+        let relations = getRelations(xCoordinate)
+        return checkAllRelations(xCoordinate, yCoordinate, relations, playerNickname, false)
     }
     
-    private func checkAllPossibilities(_ xCoordinate: Int, _ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character, _ isMiddleRow: Bool) -> Bool {
+    private func checkAllRelations(_ xCoordinate: Int, _ yCoordinate: Int, _ relations: [Int], _ playerNickname: Character, _ isMiddleRow: Bool) -> Bool {
         if isMiddleRow {
-            return checkAllPossibilitiesForMiddleRow(xCoordinate, yCoordinate, playerNickname)
+            return checkAllRelationsForMiddleRow(xCoordinate, yCoordinate, playerNickname)
         }
-        return checkHorizontally(xCoordinate, possibilities, playerNickname) || checkVertically(yCoordinate, possibilities, playerNickname)
+        return checkHorizontally(xCoordinate, relations, playerNickname) || checkVertically(yCoordinate, relations, playerNickname)
     }
     
-    private func checkAllPossibilitiesForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
+    private func checkAllRelationsForMiddleRow(_ xCoordinate: Int, _ yCoordinate: Int, _ playerNickname: Character) -> Bool {
         var hasThreePawnsHorizontally = false
         var hasThreePawnsVertically = false
         
@@ -226,8 +229,8 @@ class NineMensMorrisPlayground : Playable {
             } else {
                 hasThreePawnsHorizontally = checkHorizontally(xCoordinate, [4, 5, 6], playerNickname)
             }
-            let possibilities = getPossibilities(yCoordinate)
-            hasThreePawnsVertically = checkVertically(yCoordinate, possibilities, playerNickname)
+            let relations = getRelations(yCoordinate)
+            hasThreePawnsVertically = checkVertically(yCoordinate, relations, playerNickname)
         }
         
         if yCoordinate == 3 {
@@ -236,32 +239,32 @@ class NineMensMorrisPlayground : Playable {
             } else {
                 hasThreePawnsVertically = checkVertically(yCoordinate, [4, 5, 6], playerNickname)
             }
-            let possibilities = getPossibilities(xCoordinate)
-            hasThreePawnsHorizontally = checkHorizontally(xCoordinate, possibilities, playerNickname)
+            let relations = getRelations(xCoordinate)
+            hasThreePawnsHorizontally = checkHorizontally(xCoordinate, relations, playerNickname)
         }
         
         return hasThreePawnsHorizontally || hasThreePawnsVertically
     }
 
-    private func checkVertically(_ yCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool{
-        for possibility in possibilities {
-            if board[possibility][yCoordinate] != playerNickname {
+    private func checkVertically(_ yCoordinate: Int, _ relations: [Int], _ playerNickname: Character) -> Bool{
+        for relation in relations {
+            if board[relation][yCoordinate] != playerNickname {
                 return false
             }
         }
         return true
     }
     
-    private func checkHorizontally(_ xCoordinate: Int, _ possibilities: [Int], _ playerNickname: Character) -> Bool {
-        for possibility in possibilities {
-            if board[xCoordinate][possibility] != playerNickname {
+    private func checkHorizontally(_ xCoordinate: Int, _ relations: [Int], _ playerNickname: Character) -> Bool {
+        for relation in relations {
+            if board[xCoordinate][relation] != playerNickname {
                 return false
             }
         }
         return true
     }
     
-    private func getPossibilities(_ coordinate: Int) -> [Int] {
+    private func getRelations(_ coordinate: Int) -> [Int] {
         switch coordinate {
             case 0, 6:
                 return [0, 3, 6]
@@ -274,7 +277,7 @@ class NineMensMorrisPlayground : Playable {
         }
     }
     
-    private func getPossitionsDistnace(_ coordinate: Int) -> Int {
+    private func getRelationsDistnace(_ coordinate: Int) -> Int {
         switch coordinate {
             case 0, 6:
                 return 3
